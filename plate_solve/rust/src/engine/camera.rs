@@ -23,26 +23,40 @@ pub struct CameraModel {
 impl CameraModel {
     /// An X-T30 frame of the given pixel size taken at `focal_length_mm`.
     pub fn xt30(focal_length_mm: f64, width_px: u32, height_px: u32) -> Self {
-        Self {sensor_w_mm:XT30_SENSOR_W_MM,sensor_h_mm:XT30_SENSOR_H_MM,focal_length_mm,width_px,height_px}
+        Self {
+            sensor_w_mm: XT30_SENSOR_W_MM,
+            sensor_h_mm: XT30_SENSOR_H_MM,
+            focal_length_mm,
+            width_px,
+            height_px,
+        }
     }
 
     /// Focal length expressed in pixels (the key number for projection maths).
     pub fn focal_length_px(&self) -> f64 {
         let pixel_size = self.sensor_w_mm / self.width_px as f64;
-        self.focal_length_mm/pixel_size
+        self.focal_length_mm / pixel_size
     }
 
     /// (horizontal, vertical) field of view in degrees.
     pub fn fov_deg(&self) -> (f64, f64) {
-        (2.0*self.sensor_w_mm.atan2(2.0*self.focal_length_mm).to_degrees(),2.0*self.sensor_h_mm.atan2(2.0*self.focal_length_mm).to_degrees())
+        (
+            2.0 * self
+                .sensor_w_mm
+                .atan2(2.0 * self.focal_length_mm)
+                .to_degrees(),
+            2.0 * self
+                .sensor_h_mm
+                .atan2(2.0 * self.focal_length_mm)
+                .to_degrees(),
+        )
     }
 
     /// Arcseconds of sky per pixel at the image centre.
     pub fn pixel_scale_arcsec(&self) -> f64 {
-    (1.0 / self.focal_length_px()).atan().to_degrees() * 3600.0
+        (1.0 / self.focal_length_px()).atan().to_degrees() * 3600.0
     }
 }
-
 
 /// Settings for one lens, including which solver database to use.
 /// You set your zooms to 16 mm and 50 mm, so there are two profiles.
@@ -72,7 +86,7 @@ pub fn profile_for_focal_length(profiles: &[LensProfile], focal_mm: f64) -> Opti
     let mut diff: f64 = 100000.0;
     //find closest focal length profile
     for prof in profiles {
-        let d = (focal_mm-prof.focal_length_mm).abs();
+        let d = (focal_mm - prof.focal_length_mm).abs();
         if d < diff {
             profile = Some(prof);
             diff = d;
