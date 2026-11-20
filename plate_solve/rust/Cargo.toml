@@ -8,6 +8,8 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
 flutter_rust_bridge = "=2.13.0"
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+kamadak-exif = "0.6"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

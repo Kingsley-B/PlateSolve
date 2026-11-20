@@ -29,7 +29,7 @@ impl SkyCoord {
 
     /// Unit vector -> SkyCoord (RA wrapped to 0..360).
     pub fn from_vec(v: Vec3) -> Self {
-        let (x,y,z) = v;
+        let (x, y, z) = v;
         let ra = y.atan2(x).to_degrees().rem_euclid(360.0);
         let dec = z.clamp(-1.0, 1.0).asin().to_degrees();
         Self::new(ra, dec)
@@ -37,9 +37,9 @@ impl SkyCoord {
 
     /// Angle between two sky positions, in degrees.
     pub fn separation_deg(&self, other: &SkyCoord) -> f64 {
-        let (x0,y0,z0) = self.to_vec();
-        let (x1,y1,z1) = other.to_vec();
-        let dot = x0*x1 + y0*y1 + z0*z1;
+        let (x0, y0, z0) = self.to_vec();
+        let (x1, y1, z1) = other.to_vec();
+        let dot = x0 * x1 + y0 * y1 + z0 * z1;
         dot.clamp(-1.0, 1.0).acos().to_degrees()
     }
     pub fn glob_ne(&self) -> (Vec3, Vec3) {
@@ -48,15 +48,16 @@ impl SkyCoord {
         let rasin = self.ra_deg.to_radians().sin();
         let racos = self.ra_deg.to_radians().cos();
 
-        ((-decsin * racos, -decsin * rasin, deccos), (-rasin,racos,0.0))
+        (
+            (-decsin * racos, -decsin * rasin, deccos),
+            (-rasin, racos, 0.0),
+        )
     }
 }
 
-
-
 /// Difference between two angles wrapped into -180..180.
-pub fn wrap_angle_deg(ab:Vec2) -> f64 {
-    let (mut a,mut b) = ab;
+pub fn wrap_angle_deg(ab: Vec2) -> f64 {
+    let (mut a, mut b) = ab;
     let mut dir = 1.0;
     a = a.rem_euclid(360.0);
     b = b.rem_euclid(360.0);
@@ -66,11 +67,10 @@ pub fn wrap_angle_deg(ab:Vec2) -> f64 {
         b = a;
         a = c;
     }
-    let n = a-b;
+    let n = a - b;
     let u = 360.0 + b - a;
     if n > u {
-        return -dir*u;
+        return -dir * u;
     }
-    return dir*n;
+    return dir * n;
 }
-

@@ -51,14 +51,44 @@ fn sample_coords() -> Vec<SkyCoord> {
 
 #[test]
 fn to_vec_known_directions() {
-    assert_vec_close(SkyCoord::new(0.0, 0.0).to_vec(), (1.0, 0.0, 0.0), EPS, "RA 0, Dec 0");
-    assert_vec_close(SkyCoord::new(90.0, 0.0).to_vec(), (0.0, 1.0, 0.0), EPS, "RA 90, Dec 0");
-    assert_vec_close(SkyCoord::new(180.0, 0.0).to_vec(), (-1.0, 0.0, 0.0), EPS, "RA 180, Dec 0");
-    assert_vec_close(SkyCoord::new(270.0, 0.0).to_vec(), (0.0, -1.0, 0.0), EPS, "RA 270, Dec 0");
+    assert_vec_close(
+        SkyCoord::new(0.0, 0.0).to_vec(),
+        (1.0, 0.0, 0.0),
+        EPS,
+        "RA 0, Dec 0",
+    );
+    assert_vec_close(
+        SkyCoord::new(90.0, 0.0).to_vec(),
+        (0.0, 1.0, 0.0),
+        EPS,
+        "RA 90, Dec 0",
+    );
+    assert_vec_close(
+        SkyCoord::new(180.0, 0.0).to_vec(),
+        (-1.0, 0.0, 0.0),
+        EPS,
+        "RA 180, Dec 0",
+    );
+    assert_vec_close(
+        SkyCoord::new(270.0, 0.0).to_vec(),
+        (0.0, -1.0, 0.0),
+        EPS,
+        "RA 270, Dec 0",
+    );
     // Poles: RA doesn't matter
     for &ra in &[0.0, 77.0, 300.0] {
-        assert_vec_close(SkyCoord::new(ra, 90.0).to_vec(), (0.0, 0.0, 1.0), EPS, "north pole");
-        assert_vec_close(SkyCoord::new(ra, -90.0).to_vec(), (0.0, 0.0, -1.0), EPS, "south pole");
+        assert_vec_close(
+            SkyCoord::new(ra, 90.0).to_vec(),
+            (0.0, 0.0, 1.0),
+            EPS,
+            "north pole",
+        );
+        assert_vec_close(
+            SkyCoord::new(ra, -90.0).to_vec(),
+            (0.0, 0.0, -1.0),
+            EPS,
+            "south pole",
+        );
     }
 }
 
@@ -128,7 +158,12 @@ fn radec_vector_round_trip() {
         let back = SkyCoord::from_vec(c.to_vec());
         assert_close(back.dec_deg, c.dec_deg, EPS, &format!("Dec of {c:?}"));
         // Compare RA as a wrapped difference: 359.999 and -0.001 are the same
-        assert_close(wrap_angle_deg((back.ra_deg, c.ra_deg)), 0.0, 1e-7, &format!("RA of {c:?}"));
+        assert_close(
+            wrap_angle_deg((back.ra_deg, c.ra_deg)),
+            0.0,
+            1e-7,
+            &format!("RA of {c:?}"),
+        );
     }
 }
 
@@ -139,9 +174,24 @@ fn radec_vector_round_trip() {
 #[test]
 fn separation_known_values() {
     let origin = SkyCoord::new(0.0, 0.0);
-    assert_close(origin.separation_deg(&SkyCoord::new(90.0, 0.0)), 90.0, EPS, "quarter turn");
-    assert_close(origin.separation_deg(&SkyCoord::new(180.0, 0.0)), 180.0, EPS, "opposite");
-    assert_close(origin.separation_deg(&SkyCoord::new(0.0, 90.0)), 90.0, EPS, "to pole");
+    assert_close(
+        origin.separation_deg(&SkyCoord::new(90.0, 0.0)),
+        90.0,
+        EPS,
+        "quarter turn",
+    );
+    assert_close(
+        origin.separation_deg(&SkyCoord::new(180.0, 0.0)),
+        180.0,
+        EPS,
+        "opposite",
+    );
+    assert_close(
+        origin.separation_deg(&SkyCoord::new(0.0, 90.0)),
+        90.0,
+        EPS,
+        "to pole",
+    );
     assert_close(
         SkyCoord::new(0.0, 90.0).separation_deg(&SkyCoord::new(0.0, -90.0)),
         180.0,
@@ -172,7 +222,12 @@ fn separation_near_the_pole() {
     // Plain RA subtraction would say 180 degrees
     let a = SkyCoord::new(0.0, -89.0);
     let b = SkyCoord::new(180.0, -89.0);
-    assert_close(a.separation_deg(&b), 2.0, 1e-9, "either side of the south pole");
+    assert_close(
+        a.separation_deg(&b),
+        2.0,
+        1e-9,
+        "either side of the south pole",
+    );
 }
 
 #[test]
@@ -215,7 +270,10 @@ fn north_east_are_unit_and_perpendicular() {
 fn north_points_towards_increasing_dec() {
     // Step a tiny amount north; the step direction should match `north`.
     let step = 1e-4;
-    for c in sample_coords().into_iter().filter(|c| c.dec_deg.abs() < 89.0) {
+    for c in sample_coords()
+        .into_iter()
+        .filter(|c| c.dec_deg.abs() < 89.0)
+    {
         let (n, _) = c.glob_ne();
         let a = c.to_vec();
         let b = SkyCoord::new(c.ra_deg, c.dec_deg + step).to_vec();
@@ -227,7 +285,10 @@ fn north_points_towards_increasing_dec() {
 #[test]
 fn east_points_towards_increasing_ra() {
     let step = 1e-4;
-    for c in sample_coords().into_iter().filter(|c| c.dec_deg.abs() < 89.0) {
+    for c in sample_coords()
+        .into_iter()
+        .filter(|c| c.dec_deg.abs() < 89.0)
+    {
         let (_, e) = c.glob_ne();
         let a = c.to_vec();
         let b = SkyCoord::new(c.ra_deg + step, c.dec_deg).to_vec();
@@ -272,11 +333,16 @@ fn wrap_accepts_unnormalised_inputs() {
 
 #[test]
 fn wrap_result_always_within_half_turn() {
-    let angles = [-725.0, -360.0, -181.0, -90.0, -0.5, 0.0, 0.5, 90.0, 179.9, 180.1, 359.0, 540.0];
+    let angles = [
+        -725.0, -360.0, -181.0, -90.0, -0.5, 0.0, 0.5, 90.0, 179.9, 180.1, 359.0, 540.0,
+    ];
     for &a in &angles {
         for &b in &angles {
             let w = wrap_angle_deg((a, b));
-            assert!((-180.0..=180.0).contains(&w), "wrap({a}, {b}) = {w} out of range");
+            assert!(
+                (-180.0..=180.0).contains(&w),
+                "wrap({a}, {b}) = {w} out of range"
+            );
         }
     }
 }
@@ -305,7 +371,12 @@ fn wrap_matches_true_difference() {
             let w = wrap_angle_deg((a, b));
             let landed = (b + w).rem_euclid(360.0);
             let target = f64::rem_euclid(a, 360.0);
-            assert_close(wrap_angle_deg((landed, target)), 0.0, 1e-9, &format!("b + wrap(a,b) = a for ({a},{b})"));
+            assert_close(
+                wrap_angle_deg((landed, target)),
+                0.0,
+                1e-9,
+                &format!("b + wrap(a,b) = a for ({a},{b})"),
+            );
         }
     }
 }
